@@ -191,14 +191,13 @@ export class App implements OnInit {
 
   gerarEscala() {
     const listaTecnicos = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
-    let disponiveis = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto); // Garante a ordem do corredor
+    let disponiveis = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto);
     const total = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
     const mediaAlvo = total / listaTecnicos.length;
 
     let resultado: Tecnico[] = listaTecnicos.map(nome => ({ nome, quartos: [], totalPontos: 0 }));
 
     resultado.forEach((tecnico, index) => {
-      // Último técnico: Redinha de proteção (pega tudo)
       if (index === listaTecnicos.length - 1) {
         tecnico.quartos = [...disponiveis];
         tecnico.totalPontos = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
@@ -210,44 +209,34 @@ export class App implements OnInit {
         const p2 = disponiveis[1];
         const p3 = disponiveis[2];
 
-        // --- LOGICA DE SALTO ---
-        // Se tivermos 3 pacientes, testamos se p1+p3 é melhor que p1+p2
+        // LOGICA DE SALTO RESTRITA (Só pula 1 quarto e se for vantajoso)
         if (p1 && p2 && p3) {
-          const pesoP1P2 = p1.criticidade + p2.criticidade;
-          const pesoP1P3 = p1.criticidade + p3.criticidade;
+          const erroSequencial = Math.abs((tecnico.totalPontos! + p1.criticidade + p2.criticidade) - mediaAlvo);
+          const erroComSalto = Math.abs((tecnico.totalPontos! + p1.criticidade + p3.criticidade) - mediaAlvo);
 
-          // Se p1+p3 chega mais perto da média e não estoura absurdamente (+3 de margem)
-          if (Math.abs(pesoP1P3 - mediaAlvo) < Math.abs(pesoP1P2 - mediaAlvo) && (tecnico.totalPontos! + pesoP1P3 <= mediaAlvo + 3)) {
-            console.log(`🦘 SALTO: ${tecnico.nome} pulou Q${p2.quarto} para pegar Q${p1.quarto}+Q${p3.quarto}`);
+          // Só pula se o salto for MUITO melhor (pelo menos 2 pontos de diferença)
+          // E se o técnico não estourar a média demais
+          if (erroComSalto < (erroSequencial - 1) && (tecnico.totalPontos! + p1.criticidade + p3.criticidade) <= mediaAlvo + 1) {
             tecnico.quartos!.push(p1, p3);
-            tecnico.totalPontos! += pesoP1P3;
-            disponiveis.splice(0, 3); // Remove os 3
-            disponiveis.unshift(p2);  // Devolve o pulado pro topo
-            continue; // Volta pro início do while para ver se cabe mais!
-          }
-        }
+            tecnico.totalPontos! += (p1.criticidade + p3.criticidade);
+            disponiveis.splice(0, 3);
+            disponiveis.unshift(p2); // Devolve o Q2 para o próximo técnico
 
-        // --- LOGICA DE PARADA ---
-        const erroAtual = Math.abs(tecnico.totalPontos! - mediaAlvo);
-        const erroComProximo = Math.abs((tecnico.totalPontos! + p1.criticidade) - mediaAlvo);
-
-        // Só paramos se:
-        // 1. Já temos pelo menos um paciente
-        // 2. Adicionar o próximo PIORA muito a média
-        // 3. E não estamos deixando o próximo técnico "no vácuo"
-        if (tecnico.totalPontos! > 0 && erroComProximo > erroAtual) {
-          const sobra = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
-          const tecnicosFaltantes = listaTecnicos.length - (index + 1);
-
-          // Se eu parar agora, a média dos que sobrarem vai ser muito alta?
-          // Se sim, eu sou obrigado a carregar esse peso extra.
-          if (sobra / tecnicosFaltantes <= mediaAlvo + 2) {
-            console.log(`🛑 ${tecnico.nome} parou com ${tecnico.totalPontos} pts.`);
+            // APÓS UM SALTO, O TÉCNICO DEVE PARAR.
+            // Isso garante que ele não "pule" de novo e bagunce o corredor.
             break;
           }
         }
 
-        // --- ATRIBUIÇÃO PADRÃO ---
+        // LOGICA DE PARADA (Para manter os setores juntos)
+        const erroAtual = Math.abs(tecnico.totalPontos! - mediaAlvo);
+        const erroComProximo = Math.abs((tecnico.totalPontos! + p1.criticidade) - mediaAlvo);
+
+        // Se adicionar o próximo piora a média, ele para aqui e o próximo técnico assume a sequência
+        if (tecnico.totalPontos! > 0 && erroComProximo > erroAtual) {
+          break;
+        }
+
         tecnico.quartos!.push(p1);
         tecnico.totalPontos! += p1.criticidade;
         disponiveis.shift();
