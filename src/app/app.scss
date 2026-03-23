@@ -1,0 +1,473 @@
+// ============================================================
+// 1. VARIÁVEIS REFINADAS (MODERN MEDICAL SOFT)
+// ============================================================
+$primary        : #2D5BFF; // Azul Indigo moderno
+$primary-dark   : #1A3BB5;
+$danger         : #FF4D4D; // Vermelho vibrante
+$warning        : #FFB020; // Amarelo Amber
+$success        : #00C853; // Verde Esmeralda
+$bg-body        : #F0F4F8; // Cinza azulado ultra claro
+$white          : #FFFFFF;
+
+// Cores de Texto
+$text-main      : #2D3748; // Cinza escuro para títulos
+$text-body      : #4A5568; // Cinza médio para textos
+$text-muted     : #A0AEC0; // Para labels e dicas
+
+// Auxiliares
+$whatsapp-green : #25D366;
+$whatsapp-dark  : #128C7E;
+$danger-light   : #FFF5F5; // Rosa ultra suave para o botão Limpar
+$danger-dark    : #C53030; // Vermelho profundo para contraste de texto
+
+// ============================================================
+// 2. RESET E CONTAINER
+// ============================================================
+.container
+{
+  max-width     : 100%;
+  margin        : 10px auto;
+  padding       : 20px;
+  box-sizing    : border-box;
+  font-family   : "Inter", sans-serif;
+  background    : $bg-body;
+  min-height    : 100vh;
+  border-radius : 10px;
+  box-shadow    : 20px 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+// ============================================================
+// 3. CABEÇALHO (LOGO STYLE)
+// ============================================================
+.spanH1
+{
+  text-align     : center;
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  margin-bottom  : 50px;
+
+  h1
+  {
+    margin                  : 0;
+    font-size               : 2.4rem;
+    background              : linear-gradient(135deg, $primary, #6366F1);
+    -webkit-background-clip : text;
+    -webkit-text-fill-color : transparent;
+    font-family             : "Lobster", cursive;
+    filter                  : drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+  }
+
+  h4
+  {
+    margin         : 5px 0 0 0;
+    color          : $text-muted;
+    font-weight    : 600;
+    text-transform : uppercase;
+    font-size      : 0.75rem;
+    letter-spacing : 2px;
+  }
+}
+
+// ============================================================
+// 4. ELEMENTOS DE FORMULÁRIO (ESTRUTURA STACK)
+// ============================================================
+section
+{
+  margin-bottom : 30px;
+}
+
+h3
+{
+  font-size      : 0.9rem;
+  color          : $text-main;
+  text-transform : uppercase;
+  letter-spacing : 1px;
+  font-weight    : 800;
+  margin-bottom  : 20px;
+  display        : flex;
+  align-items    : center;
+
+  &:after
+  {
+    content     : "";
+    flex        : 1;
+    height      : 1px;
+    background  : #E2E8F0;
+    margin-left : 15px;
+  }
+}
+
+.form-container-stack
+{
+  display        : flex;
+  flex-direction : column;
+  gap            : 15px;
+  background     : $white;
+  padding        : 20px;
+  border-radius  : 15px;
+  border         : 1px solid rgba($primary, 0.1);
+  box-shadow     : 0 10px 25px rgba(0, 0, 0, 0.03);
+
+  .field
+  {
+    display        : flex;
+    flex-direction : column;
+    gap            : 5px;
+    margin-bottom  : 20px;
+
+    label
+    {
+      font-size      : 0.75rem;
+      font-weight    : 800;
+      color          : #828282;
+      text-transform : capitalize;
+      letter-spacing : 1px;
+    }
+  }
+
+  .row-dupla
+  {
+    display               : grid;
+    grid-template-columns : 100px 1fr;
+    gap                   : 12px;
+  }
+
+  input, select
+  {
+    width         : 100%;
+    padding       : 12px;
+    border        : 2px solid #EDF2F7;
+    border-radius : 10px;
+    font-size     : 16px;
+    box-sizing    : border-box;
+    color         : $text-main;
+    transition    : all 0.2s;
+
+    &:focus
+    {
+      outline      : none;
+      border-color : $primary;
+      box-shadow   : 0 0 0 3px rgba($primary, 0.1);
+    }
+  }
+
+  .btn-addPaciente
+  {
+    width            : 100%;
+    background-color : $primary;
+    color            : $white;
+    border           : none;
+    padding          : 16px;
+    border-radius    : 12px;
+    font-weight      : 800;
+    text-transform   : uppercase;
+    cursor           : pointer;
+    box-shadow       : 0 4px 12px rgba($primary, 0.2);
+    transition       : all 0.2s;
+
+    &:active
+    {
+      transform : scale(0.97);
+    }
+  }
+}
+
+// ============================================================
+// 5. LISTA DE PACIENTES (CARDS INTERATIVOS)
+// ============================================================
+.paciente-card
+{
+  background      : $white;
+  padding         : 16px;
+  margin-bottom   : 10px;
+  display         : flex;
+  align-items     : center;
+  justify-content : space-between;
+  border-radius   : 12px;
+  box-shadow      : 0 4px 6px rgba(0, 0, 0, 0.02);
+  border-left     : 5px solid #CBD5E0;
+  transition      : transform 0.2s ease-out, box-shadow 0.2s ease-out;
+
+  &:hover
+  {
+    cursor     : pointer;
+    transform  : scale(1.01);
+    box-shadow : 0 8px 10px rgba(0, 0, 0, 0.25);
+  }
+
+  &[data-crit="5"]
+  {
+    border-left-color : $danger;
+  }
+
+  &[data-crit="3"]
+  {
+    border-left-color : $warning;
+  }
+
+  &[data-crit="1"]
+  {
+    border-left-color : $success;
+  }
+
+  span
+  {
+    font-size   : 0.95rem;
+    font-weight : 600;
+    color       : $text-main;
+  }
+
+  button
+  {
+    background : transparent;
+    border     : none;
+    color      : $danger;
+    font-size  : 1.4rem;
+    cursor     : pointer;
+    transition : color 0.2s;
+
+    &:hover
+    {
+      color : $danger;
+    }
+
+    .material-symbols-outlined
+    {
+      color     : $danger;
+      font-size : 1.2rem;
+    }
+  }
+}
+
+// ============================================================
+// 6. AÇÕES DA ESCALA (BOTÕES LADO A LADO)
+// ============================================================
+.row-actions
+{
+  display               : grid;
+  grid-template-columns : 1fr 1fr;
+  gap                   : 15px;
+  margin                : 30px 0;
+
+  button
+  {
+    padding        : 16px 10px;
+    border-radius  : 12px;
+    font-weight    : 800;
+    font-size      : 0.85rem;
+    text-transform : uppercase;
+    letter-spacing : 0.5px;
+    cursor         : pointer;
+    border         : none;
+    transition     : all 0.2s;
+    box-shadow     : 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    &:disabled
+    {
+      background-color : #E2E8F0 !important;
+      color            : $text-muted !important;
+      cursor           : not-allowed;
+      box-shadow       : none !important;
+    }
+  }
+
+  .btn-gerar
+  {
+    background-color : $primary;
+    color            : $white;
+
+    &:hover:not(:disabled)
+    {
+      background-color : $primary-dark;
+    }
+  }
+
+  .btn-limpar
+  {
+    background-color : $danger-light;
+    color            : $danger-dark;
+    border           : 1px solid rgba($danger-dark, 0.1);
+
+    &:hover:not(:disabled)
+    {
+      background-color : darken($danger-light, 2%);
+    }
+  }
+}
+
+// ============================================================
+// 7. RESULTADO DA ESCALA (OUTPUT)
+// ============================================================
+.tecnico-col
+{
+  background    : $white;
+  border-radius : 10px;
+  padding       : 15px;
+  margin-bottom : 15px;
+  border        : none;
+  box-shadow    : 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  h4
+  {
+    margin          : 0 0 15px 0;
+    display         : flex;
+    justify-content : space-between;
+    align-items     : center;
+    color           : $primary;
+    font-weight     : 800;
+    border-bottom   : 1px dashed #EDF2F7;
+    padding-bottom  : 12px;
+
+    span
+    {
+      background    : $bg-body;
+      padding       : 4px 12px;
+      border-radius : 20px;
+      font-size     : 0.75rem;
+      color         : $text-body;
+      font-weight   : 600;
+    }
+  }
+
+  ul
+  {
+    padding    : 0;
+    margin     : 0;
+    list-style : none;
+
+    li
+    {
+      color       : $text-body;
+      padding     : 8px 0;
+      display     : flex;
+      align-items : start;
+      font-size   : 1rem;
+
+
+      &:before
+      {
+        content      : "•";
+        color        : $primary;
+        font-weight  : bold;
+        margin-right : 12px;
+        font-size    : 0.85rem;
+      }
+    }
+  }
+}
+
+// ============================================================
+// 8. WHATSAPP (FIXO NO FINAL)
+// ============================================================
+.btn-whatsapp
+{
+  width            : 100%;
+  padding          : 16px;
+  background-color : $whatsapp-green;
+  color            : $white;
+  border           : none;
+  border-radius    : 12px;
+  font-weight      : 800;
+  font-size        : 1rem;
+  display          : flex;
+  align-items      : center;
+  justify-content  : center;
+  gap              : 12px;
+  cursor           : pointer;
+  box-shadow       : 0 6px 15px rgba($whatsapp-green, 0.3);
+  transition       : all 0.2s;
+
+  .icon-wap
+  {
+    width  : 24px;
+    height : 24px;
+  }
+
+  &:hover
+  {
+    background-color : $whatsapp-dark;
+    transform        : translateY(-2px);
+  }
+
+  &:active
+  {
+    transform : translateY(0);
+  }
+}
+
+// ============================================================
+//  9. INFO
+// ============================================================
+.quarto-item {
+  display: flex;
+  justify-content: start;
+  padding: 10px 0;
+  border-bottom: 1px solid #EDF2F7; // Linha divisória sutil
+  list-style: none;
+
+  &:last-child { border-bottom: none; }
+
+  .quarto-info {
+    display: flex;
+    align-items: start;
+    gap: 4px;
+
+    .quarto-numero {
+      font-weight: 800;
+      color: $primary;
+      font-size: 0.9rem;
+      min-width: 1.5rem;
+    }
+
+    .paciente-nome {
+      color: $text-body;
+      font-weight: 400;
+      font-size: 0.95rem;
+    }
+  }
+
+  // Estilo das Etiquetas (Badges)
+  .badge-crit {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin-left: 8px;
+
+    &[data-crit="5"] {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+    }
+    &[data-crit="3"] {
+      background-color: rgba($warning, 0.1);
+      color: darken($warning, 20%);
+    }
+    &[data-crit="1"] {
+      background-color: rgba($success, 0.1);
+      color: $success;
+    }
+  }
+}
+
+// ============================================================
+// 10. MEDIA QUERY (OTIMIZAÇÃO DESKTOP / SAMSUNG BOOK)
+// ============================================================
+@media (min-width : 768px)
+{
+  .container
+  {
+    max-width     : 800px;
+    margin        : 30px auto;
+    padding       : 40px 100px;
+    border-radius : 20px;
+    box-shadow    : 10px 55px 60px rgba(0, 0, 0, 0.25);
+  }
+
+  .spanH1 h1
+  {
+    font-size : 3rem;
+  }
+}
+
