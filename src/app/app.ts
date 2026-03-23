@@ -103,120 +103,145 @@ export class App implements OnInit {
   }
 
   // gerarEscala() {
-  //   const listaTecnicos = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
-  //   if (listaTecnicos.length === 0 || this.pacientes().length === 0) return;
+  //   const nomes = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
+  //   if (nomes.length === 0 || this.pacientes().length === 0) return;
   //
-  //   const pacientes = [...this.pacientes()];
-  //   const totalPontos = pacientes.reduce((acc, p) => acc + p.criticidade, 0);
-  //   const mediaAlvo = totalPontos / listaTecnicos.length;
-  //
-  //   let resultado: Tecnico[] = listaTecnicos.map(nome => ({nome, quartos: [], totalPontos: 0}));
+  //   // 1. DISTRIBUIÇÃO INICIAL (O "Grosso" da escala)
+  //   let resultado: Tecnico[] = nomes.map(nome => ({nome, quartos: [], totalPontos: 0}));
+  //   const pacientes = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto);
+  //   const mediaAlvo = pacientes.reduce((acc, p) => acc + p.criticidade, 0) / nomes.length;
   //
   //   let pIndex = 0;
   //   for (let i = 0; i < resultado.length; i++) {
-  //     // Enquanto o técnico atual estiver abaixo da média e ainda houver pacientes
   //     while (pIndex < pacientes.length) {
   //       const p = pacientes[pIndex];
-  //       const diffAtual = Math.abs(resultado[i].totalPontos! - mediaAlvo);
-  //       const diffComProximo = Math.abs((resultado[i].totalPontos! + p.criticidade) - mediaAlvo);
-  //
-  //       // Se adicionar o paciente deixa o técnico MAIS PERTO da média do que não adicionar
-  //       // OU se ele for o último técnico (que precisa herdar o que sobrar)
-  //       if (diffComProximo <= diffAtual || i === resultado.length - 1) {
+  //       if (i === resultado.length - 1) {
+  //         resultado[i].quartos!.push(p);
+  //         resultado[i].totalPontos! += p.criticidade;
+  //         pIndex++;
+  //         continue;
+  //       }
+  //       const erroAtual = Math.abs(resultado[i].totalPontos! - mediaAlvo);
+  //       const erroSeAdicionar = Math.abs((resultado[i].totalPontos! + p.criticidade) - mediaAlvo);
+  //       if (erroSeAdicionar <= erroAtual || resultado[i].totalPontos === 0) {
   //         resultado[i].quartos!.push(p);
   //         resultado[i].totalPontos! += p.criticidade;
   //         pIndex++;
   //       } else {
-  //         // Se adicionar piora o equilíbrio, passa para o próximo técnico
   //         break;
   //       }
   //     }
   //   }
+  //
+  //   // 2. REFINAMENTO BIDIRECIONAL (COM DEBUG)
+  //   console.log("--- Iniciando Refinamento de Fronteira ---");
+  //
+  //   // 2. REFINAMENTO COM PERMUTA (A "Troca de Figurinhas")
+  //   for (let i = 0; i < resultado.length - 1; i++) {
+  //     const atual = resultado[i];
+  //     const proximo = resultado[i + 1];
+  //
+  //     if (atual.quartos!.length > 0 && proximo.quartos!.length > 0) {
+  //       const diffOriginal = Math.abs(atual.totalPontos! - proximo.totalPontos!);
+  //
+  //       const ultimoAtu = atual.quartos![atual.quartos!.length - 1];
+  //       const primeiroProx = proximo.quartos![0];
+  //
+  //       // TESTE DA PERMUTA: Maria dá o Q5(3) e recebe o Q6(1)
+  //       const novoTotalAtuPermuta = atual.totalPontos! - ultimoAtu.criticidade + primeiroProx.criticidade;
+  //       const novoTotalProxPermuta = proximo.totalPontos! + ultimoAtu.criticidade - primeiroProx.criticidade;
+  //       const diffPermuta = Math.abs(novoTotalAtuPermuta - novoTotalProxPermuta);
+  //
+  //       // TESTE DE CESSÃO: Maria apenas dá o Q5(3)
+  //       const diffCessao = Math.abs((atual.totalPontos! - ultimoAtu.criticidade) - (proximo.totalPontos! + ultimoAtu.criticidade));
+  //
+  //       console.log(`Analisando ${atual.nome} vs ${proximo.nome}:`);
+  //       console.log(`- Atual: ${diffOriginal} | Se Permutar: ${diffPermuta} | Se Ceder: ${diffCessao}`);
+  //
+  //       // Executa a Permuta se for a melhor opção e diminuir a diferença original
+  //       if (diffPermuta < diffOriginal && diffPermuta <= diffCessao) {
+  //         console.log(`✅ PERMUTA REALIZADA: ${atual.nome} trocou Q${ultimoAtu.quarto} por Q${primeiroProx.quarto}`);
+  //
+  //         // Realiza a troca física nos arrays
+  //         const qMaria = atual.quartos!.pop()!;
+  //         const qLuciene = proximo.quartos!.shift()!;
+  //
+  //         atual.quartos!.push(qLuciene);
+  //         proximo.quartos!.unshift(qMaria);
+  //
+  //         atual.totalPontos = novoTotalAtuPermuta;
+  //         proximo.totalPontos = novoTotalProxPermuta;
+  //
+  //         i = -1; // Reinicia para checar se a nova Maria precisa permutar com Godofredina
+  //       }
+  //       // Se a permuta não for boa, mas ceder um quarto for:
+  //       else if (diffCessao < diffOriginal) {
+  //         console.log(`✅ CESSÃO REALIZADA: ${atual.nome} passou Q${ultimoAtu.quarto} para ${proximo.nome}`);
+  //         proximo.quartos!.unshift(atual.quartos!.pop()!);
+  //         atual.totalPontos! -= ultimoAtu.criticidade;
+  //         proximo.totalPontos! += ultimoAtu.criticidade;
+  //         i = -1;
+  //       }
+  //     }
+  //   }
+  //   console.log("--- Fim do Refinamento ---", resultado);
+  //
   //   this.escalaGerada.set(resultado);
   // }
+
   gerarEscala() {
-    const nomes = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
-    if (nomes.length === 0 || this.pacientes().length === 0) return;
+    const listaTecnicos = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
+    let pacientesDisponiveis = [...this.pacientes()];
+    const totalPontos = pacientesDisponiveis.reduce((acc, p) => acc + p.criticidade, 0);
+    const mediaAlvo = totalPontos / listaTecnicos.length;
 
-    // 1. DISTRIBUIÇÃO INICIAL (O "Grosso" da escala)
-    let resultado: Tecnico[] = nomes.map(nome => ({nome, quartos: [], totalPontos: 0}));
-    const pacientes = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto);
-    const mediaAlvo = pacientes.reduce((acc, p) => acc + p.criticidade, 0) / nomes.length;
+    let resultado: Tecnico[] = listaTecnicos.map(nome => ({ nome, quartos: [], totalPontos: 0 }));
 
-    let pIndex = 0;
-    for (let i = 0; i < resultado.length; i++) {
-      while (pIndex < pacientes.length) {
-        const p = pacientes[pIndex];
-        if (i === resultado.length - 1) {
-          resultado[i].quartos!.push(p);
-          resultado[i].totalPontos! += p.criticidade;
-          pIndex++;
-          continue;
-        }
-        const erroAtual = Math.abs(resultado[i].totalPontos! - mediaAlvo);
-        const erroSeAdicionar = Math.abs((resultado[i].totalPontos! + p.criticidade) - mediaAlvo);
-        if (erroSeAdicionar <= erroAtual || resultado[i].totalPontos === 0) {
-          resultado[i].quartos!.push(p);
-          resultado[i].totalPontos! += p.criticidade;
-          pIndex++;
-        } else {
+    resultado.forEach((tecnico, index) => {
+      // Se for o último técnico, ele pega tudo o que sobrou
+      if (index === listaTecnicos.length - 1) {
+        tecnico.quartos = [...pacientesDisponiveis];
+        tecnico.totalPontos = pacientesDisponiveis.reduce((acc, p) => acc + p.criticidade, 0);
+        return;
+      }
+
+      while (pacientesDisponiveis.length > 0) {
+        const p1 = pacientesDisponiveis[0]; // Q1
+        const p2 = pacientesDisponiveis[1]; // Q2
+        const p3 = pacientesDisponiveis[2]; // Q3
+
+        // TESTE DE COMBINAÇÕES (O "Cérebro" do App)
+        const erroAtual = Math.abs(tecnico.totalPontos! - mediaAlvo);
+        const erroComP1 = Math.abs((tecnico.totalPontos! + p1.criticidade) - mediaAlvo);
+
+        // 1. Decisão de parar: Se adicionar o P1 piora meu erro, eu paro aqui.
+        if (erroComP1 > erroAtual && tecnico.totalPontos! > 0) {
+          console.log(`🛑 ${tecnico.nome} parou em ${tecnico.totalPontos} pts (mais perto da média ${mediaAlvo.toFixed(2)})`);
           break;
         }
-      }
-    }
 
-    // 2. REFINAMENTO BIDIRECIONAL (COM DEBUG)
-    console.log("--- Iniciando Refinamento de Fronteira ---");
+        // 2. Lógica do SALTO Geográfico (O seu caso específico)
+        // Se eu tenho P1 e P2, mas pegar P1 + P3 me deixa mais perto da média que P1 + P2
+        if (p1 && p2 && p3) {
+          const pesoP1P2 = p1.criticidade + p2.criticidade;
+          const pesoP1P3 = p1.criticidade + p3.criticidade;
 
-    // 2. REFINAMENTO COM PERMUTA (A "Troca de Figurinhas")
-    for (let i = 0; i < resultado.length - 1; i++) {
-      const atual = resultado[i];
-      const proximo = resultado[i + 1];
-
-      if (atual.quartos!.length > 0 && proximo.quartos!.length > 0) {
-        const diffOriginal = Math.abs(atual.totalPontos! - proximo.totalPontos!);
-
-        const ultimoAtu = atual.quartos![atual.quartos!.length - 1];
-        const primeiroProx = proximo.quartos![0];
-
-        // TESTE DA PERMUTA: Maria dá o Q5(3) e recebe o Q6(1)
-        const novoTotalAtuPermuta = atual.totalPontos! - ultimoAtu.criticidade + primeiroProx.criticidade;
-        const novoTotalProxPermuta = proximo.totalPontos! + ultimoAtu.criticidade - primeiroProx.criticidade;
-        const diffPermuta = Math.abs(novoTotalAtuPermuta - novoTotalProxPermuta);
-
-        // TESTE DE CESSÃO: Maria apenas dá o Q5(3)
-        const diffCessao = Math.abs((atual.totalPontos! - ultimoAtu.criticidade) - (proximo.totalPontos! + ultimoAtu.criticidade));
-
-        console.log(`Analisando ${atual.nome} vs ${proximo.nome}:`);
-        console.log(`- Atual: ${diffOriginal} | Se Permutar: ${diffPermuta} | Se Ceder: ${diffCessao}`);
-
-        // Executa a Permuta se for a melhor opção e diminuir a diferença original
-        if (diffPermuta < diffOriginal && diffPermuta <= diffCessao) {
-          console.log(`✅ PERMUTA REALIZADA: ${atual.nome} trocou Q${ultimoAtu.quarto} por Q${primeiroProx.quarto}`);
-
-          // Realiza a troca física nos arrays
-          const qMaria = atual.quartos!.pop()!;
-          const qLuciene = proximo.quartos!.shift()!;
-
-          atual.quartos!.push(qLuciene);
-          proximo.quartos!.unshift(qMaria);
-
-          atual.totalPontos = novoTotalAtuPermuta;
-          proximo.totalPontos = novoTotalProxPermuta;
-
-          i = -1; // Reinicia para checar se a nova Maria precisa permutar com Godofredina
+          if (Math.abs(pesoP1P3 - mediaAlvo) < Math.abs(pesoP1P2 - mediaAlvo)) {
+            console.log(`🦘 SALTO: ${tecnico.nome} pegou Q${p1.quarto} e Q${p3.quarto}, pulando o Q${p2.quarto} para a próxima.`);
+            tecnico.quartos!.push(p1, p3);
+            tecnico.totalPontos! += (p1.criticidade + p3.criticidade);
+            pacientesDisponiveis.splice(0, 3); // Remove os 3 primeiros
+            pacientesDisponiveis.unshift(p2);  // Devolve o P2 (pulado) para o início da fila
+            continue;
+          }
         }
-        // Se a permuta não for boa, mas ceder um quarto for:
-        else if (diffCessao < diffOriginal) {
-          console.log(`✅ CESSÃO REALIZADA: ${atual.nome} passou Q${ultimoAtu.quarto} para ${proximo.nome}`);
-          proximo.quartos!.unshift(atual.quartos!.pop()!);
-          atual.totalPontos! -= ultimoAtu.criticidade;
-          proximo.totalPontos! += ultimoAtu.criticidade;
-          i = -1;
-        }
+
+        // 3. Padrão: Adiciona o próximo da fila
+        tecnico.quartos!.push(p1);
+        tecnico.totalPontos! += p1.criticidade;
+        pacientesDisponiveis.shift();
       }
-    }
-    console.log("--- Fim do Refinamento ---", resultado);
+    });
 
     this.escalaGerada.set(resultado);
   }
@@ -243,34 +268,14 @@ export class App implements OnInit {
     }
   }
 
-  // compartilharWhatsApp() {
-  //   const escala = this.escalaGerada();
-  //   if (escala.length === 0) return;
-  //
-  //   let mensagem = `📋 ESCALA DO PLANTÃO \n${new Date().toLocaleDateString()}\n\n`;
-  //
-  //   escala.forEach(t => {
-  //     mensagem += `*👤 TÉC(A): ${t.nome.toUpperCase()}* (${t.totalPontos} pts)\n`;
-  //     t.quartos?.forEach(p => {
-  //       const icon = p.criticidade === 5 ? '🔴' : p.criticidade === 3 ? '🟡' : '🟢';
-  //       mensagem += `${icon} Q${p.quarto}: ${p.nome}\n`;
-  //     });
-  //     mensagem += `\n\n`;
-  //   });
-  //
-  //   mensagem += `_Gerado por: Escala Inteligente_`;
-  //
-  //   // Codifica a URI para o link do WhatsApp
-  //   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
-  //   window.open(url, '_blank');
-  // }
+
   compartilharWhatsApp() {
     const escala = this.escalaGerada();
     if (escala.length === 0) return;
 
     // Pega a data e a hora atual formatadas
     const data = new Date().toLocaleDateString('pt-BR');
-    const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const hora = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
 
     // let mensagem = `📋 *ESCALA DO PLANTÃO*\n📅 ${data} às ${hora}\n\n`;
     let mensagem = `📋 *ESCALA DO PLANTÃO*\n🕒 ${data} — ${hora}\n\n`;
