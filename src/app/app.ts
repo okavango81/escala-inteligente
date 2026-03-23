@@ -116,23 +116,53 @@ export class App implements OnInit {
 
   salvarEdicao() {
     if (this.indiceEditando > -1) {
+      const pacienteOriginal = this.pacientes()[this.indiceEditando]; // O dado antes da mudança
       const pacienteEditado = this.editandoPaciente()!;
 
-      // Validação: O novo quarto escolhido já está ocupado por OUTRA pessoa?
+      // 1. Validação de Quarto Duplicado
       if (this.quartoJaExiste(pacienteEditado.quarto, this.indiceEditando)) {
         alert(`Erro: O Quarto ${pacienteEditado.quarto} já está ocupado por outro paciente!`);
-        return; // Interrompe o salvamento
+        return;
       }
 
+      // 2. Verificação de Mudança Estrutural
+      // Se o quarto OU a criticidade mudaram, precisamos regerar a escala.
+      // Se mudou apenas o nome, apenas atualizamos a lista.
+      const mudouEstrutura =
+        pacienteOriginal.quarto !== pacienteEditado.quarto ||
+        pacienteOriginal.criticidade !== pacienteEditado.criticidade;
+
+      // 3. Atualiza a lista de pacientes (Signal)
       const listaAtual = [...this.pacientes()];
       listaAtual[this.indiceEditando] = pacienteEditado;
 
-      // Mantém a lista ordenada caso o número do quarto tenha mudado na edição
+      // Ordena e salva no Signal
       this.pacientes.set(listaAtual.sort((a, b) => a.quarto - b.quarto));
 
       this.fecharEdicao();
-      this.gerarEscala();
+
+      // 4. Decisão Inteligente: Regerar ou Apenas Atualizar?
+      if (mudouEstrutura) {
+        this.gerarEscala(); // Muda a distribuição dos técnicos
+      } else {
+        // APENAS ATUALIZA O NOME NA ESCALA ATUAL (Sem trocar ninguém de técnico)
+        this.atualizarNomeNaEscalaGerada(pacienteEditado);
+      }
     }
+  }
+
+// para não perder o Drag & Drop manual
+  private atualizarNomeNaEscalaGerada(pacienteEditado: Paciente) {
+    const escala = this.escalaGerada();
+
+    escala.forEach(tecnico => {
+      const p = tecnico.quartos.find(q => q.quarto === pacienteEditado.quarto);
+      if (p) {
+        p.nome = pacienteEditado.nome; // Atualiza apenas o nome dentro do técnico onde ele já está
+      }
+    });
+
+    this.escalaGerada.set([...escala]);
   }
 
   // O CdkDragDrop entra aqui apenas como TIPAGEM do evento
@@ -173,9 +203,9 @@ export class App implements OnInit {
   }
 
   calcularPeso(pontos: number): number {
-    if (pontos === 5) return 7;   // 🔴 Crítico
-    if (pontos === 3) return 4;  // 🟡 Médio
-    return 1;                      // 🟢 Leve
+    if (pontos === 5) return 3;
+    if (pontos === 3) return 2;
+    return 1;
   }
 
   gerarEscala() {
@@ -221,6 +251,21 @@ export class App implements OnInit {
     this.escalaGerada.set(resultado);
   }
 
+  formatarTecnicos() {
+    const valor = this.tecnicosInput();
+
+    if (valor) {
+      // 1. Divide pelos nomes na vírgula
+      // 2. Formata cada nome para Capitalize
+      // 3. Junta tudo de volta com vírgula e espaço
+      const nomesFormatados = valor
+        .split(',')
+        .map(nome => this.aplicarCapitalize(nome.trimStart())) // trimStart evita comer o espaço enquanto digita
+        .join(', ');
+
+      this.tecnicosInput.set(nomesFormatados);
+    }
+  }
 
   formatarNome(alvo?: any) {
     // Se não passar nada, formata o novoNome (cadastro)

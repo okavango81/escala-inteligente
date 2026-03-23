@@ -158,12 +158,12 @@ h3
     background-color : $primary;
     color            : $white;
     border           : none;
-    padding          : 16px;
-    border-radius    : 12px;
+    padding          : 14px;
+    border-radius    : 30px;
     font-weight      : 800;
     text-transform   : uppercase;
     cursor           : pointer;
-    box-shadow       : 0 4px 12px rgba($primary, 0.2);
+    box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
     transition       : all 0.2s;
 
     &:active
@@ -308,7 +308,7 @@ h3
 
   button
   {
-    padding        : 16px 10px;
+    padding        : 14px 6px;
     border-radius  : 12px;
     font-weight    : 800;
     font-size      : 0.85rem;
@@ -318,6 +318,7 @@ h3
     border         : none;
     transition     : all 0.2s;
     box-shadow     : 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom  : 20px;
 
     &:disabled
     {
@@ -335,6 +336,7 @@ h3
     color            : $white;
     border-radius    : 30px;
     transition       : all 0.3s ease; // Adicione uma transição suave para a troca de cor
+    box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
 
     &:hover:not(:disabled)
     {
@@ -344,7 +346,7 @@ h3
     // NOVA CLASSE: Quando a escala já existe
     &.btn-regerar
     {
-      background-color : #315aea; // Um Laranja vibrante (pode usar $warning se preferir)
+      background-color : rgb(248, 201, 58); // Um Laranja vibrante (pode usar $warning se preferir)
       border           : none;
       box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
 
@@ -441,7 +443,7 @@ h3
   background-color : $whatsapp-green;
   color            : $white;
   border           : none;
-  border-radius    : 12px;
+  border-radius    : 30px;
   font-weight      : 800;
   font-size        : 1rem;
   display          : flex;
@@ -627,8 +629,8 @@ h3
   border           : none;
   font-size        : 1.4rem;
   cursor           : pointer;
-  padding          : 10px 20px;
-  border-radius    : 8px;
+  padding          : 14px 20px;
+  border-radius    : 30px;
 }
 
 .btn-salvar
@@ -636,8 +638,8 @@ h3
   background-color : #2196F3; /* Azul (mesmo do gerar) */
   color            : white;
   border           : none;
-  padding          : 10px 20px;
-  border-radius    : 8px;
+  padding          : 14px 20px;
+  border-radius    : 30px;
   cursor           : pointer;
 }
 
@@ -683,7 +685,7 @@ h3
 {
   .container
   {
-    max-width     : 800px;
+    max-width     : 768px;
     margin        : 30px auto;
     padding       : 40px 100px;
     border-radius : 20px;
