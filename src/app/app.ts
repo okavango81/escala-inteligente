@@ -191,55 +191,66 @@ export class App implements OnInit {
 
   gerarEscala() {
     const listaTecnicos = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
-    let pacientesDisponiveis = [...this.pacientes()];
-    const totalPontos = pacientesDisponiveis.reduce((acc, p) => acc + p.criticidade, 0);
-    const mediaAlvo = totalPontos / listaTecnicos.length;
+    let disponiveis = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto); // Garante a ordem do corredor
+    const total = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
+    const mediaAlvo = total / listaTecnicos.length;
 
     let resultado: Tecnico[] = listaTecnicos.map(nome => ({ nome, quartos: [], totalPontos: 0 }));
 
     resultado.forEach((tecnico, index) => {
-      // Se for o último técnico, ele pega tudo o que sobrou
+      // Último técnico: Redinha de proteção (pega tudo)
       if (index === listaTecnicos.length - 1) {
-        tecnico.quartos = [...pacientesDisponiveis];
-        tecnico.totalPontos = pacientesDisponiveis.reduce((acc, p) => acc + p.criticidade, 0);
+        tecnico.quartos = [...disponiveis];
+        tecnico.totalPontos = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
         return;
       }
 
-      while (pacientesDisponiveis.length > 0) {
-        const p1 = pacientesDisponiveis[0]; // Q1
-        const p2 = pacientesDisponiveis[1]; // Q2
-        const p3 = pacientesDisponiveis[2]; // Q3
+      while (disponiveis.length > 0) {
+        const p1 = disponiveis[0];
+        const p2 = disponiveis[1];
+        const p3 = disponiveis[2];
 
-        // TESTE DE COMBINAÇÕES (O "Cérebro" do App)
-        const erroAtual = Math.abs(tecnico.totalPontos! - mediaAlvo);
-        const erroComP1 = Math.abs((tecnico.totalPontos! + p1.criticidade) - mediaAlvo);
-
-        // 1. Decisão de parar: Se adicionar o P1 piora meu erro, eu paro aqui.
-        if (erroComP1 > erroAtual && tecnico.totalPontos! > 0) {
-          console.log(`🛑 ${tecnico.nome} parou em ${tecnico.totalPontos} pts (mais perto da média ${mediaAlvo.toFixed(2)})`);
-          break;
-        }
-
-        // 2. Lógica do SALTO Geográfico (O seu caso específico)
-        // Se eu tenho P1 e P2, mas pegar P1 + P3 me deixa mais perto da média que P1 + P2
+        // --- LOGICA DE SALTO ---
+        // Se tivermos 3 pacientes, testamos se p1+p3 é melhor que p1+p2
         if (p1 && p2 && p3) {
           const pesoP1P2 = p1.criticidade + p2.criticidade;
           const pesoP1P3 = p1.criticidade + p3.criticidade;
 
-          if (Math.abs(pesoP1P3 - mediaAlvo) < Math.abs(pesoP1P2 - mediaAlvo)) {
-            console.log(`🦘 SALTO: ${tecnico.nome} pegou Q${p1.quarto} e Q${p3.quarto}, pulando o Q${p2.quarto} para a próxima.`);
+          // Se p1+p3 chega mais perto da média e não estoura absurdamente (+3 de margem)
+          if (Math.abs(pesoP1P3 - mediaAlvo) < Math.abs(pesoP1P2 - mediaAlvo) && (tecnico.totalPontos! + pesoP1P3 <= mediaAlvo + 3)) {
+            console.log(`🦘 SALTO: ${tecnico.nome} pulou Q${p2.quarto} para pegar Q${p1.quarto}+Q${p3.quarto}`);
             tecnico.quartos!.push(p1, p3);
-            tecnico.totalPontos! += (p1.criticidade + p3.criticidade);
-            pacientesDisponiveis.splice(0, 3); // Remove os 3 primeiros
-            pacientesDisponiveis.unshift(p2);  // Devolve o P2 (pulado) para o início da fila
-            continue;
+            tecnico.totalPontos! += pesoP1P3;
+            disponiveis.splice(0, 3); // Remove os 3
+            disponiveis.unshift(p2);  // Devolve o pulado pro topo
+            continue; // Volta pro início do while para ver se cabe mais!
           }
         }
 
-        // 3. Padrão: Adiciona o próximo da fila
+        // --- LOGICA DE PARADA ---
+        const erroAtual = Math.abs(tecnico.totalPontos! - mediaAlvo);
+        const erroComProximo = Math.abs((tecnico.totalPontos! + p1.criticidade) - mediaAlvo);
+
+        // Só paramos se:
+        // 1. Já temos pelo menos um paciente
+        // 2. Adicionar o próximo PIORA muito a média
+        // 3. E não estamos deixando o próximo técnico "no vácuo"
+        if (tecnico.totalPontos! > 0 && erroComProximo > erroAtual) {
+          const sobra = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
+          const tecnicosFaltantes = listaTecnicos.length - (index + 1);
+
+          // Se eu parar agora, a média dos que sobrarem vai ser muito alta?
+          // Se sim, eu sou obrigado a carregar esse peso extra.
+          if (sobra / tecnicosFaltantes <= mediaAlvo + 2) {
+            console.log(`🛑 ${tecnico.nome} parou com ${tecnico.totalPontos} pts.`);
+            break;
+          }
+        }
+
+        // --- ATRIBUIÇÃO PADRÃO ---
         tecnico.quartos!.push(p1);
         tecnico.totalPontos! += p1.criticidade;
-        pacientesDisponiveis.shift();
+        disponiveis.shift();
       }
     });
 
