@@ -189,58 +189,401 @@ export class App implements OnInit {
   //   this.escalaGerada.set(resultado);
   // }
 
+  // calcularPeso(pontos: number): number {
+  //   if (pontos === 5) return 10;   // 🔴 MUITO PESADO
+  //   if (pontos === 3) return 3.5;  // 🟡 médio
+  //   return 1;                      // 🟢 leve
+  // }
+  //
+  // gerarEscala() {
+  //   const listaTecnicos = this.tecnicosInput()
+  //     .split(',')
+  //     .map(n => n.trim())
+  //     .filter(n => n !== '');
+  //
+  //   let pacientes = [...this.pacientes()]
+  //     .sort((a, b) => a.quarto - b.quarto);
+  //
+  //   const LIMITE_DIST = 2;
+  //
+  //   const peso = (p: Paciente) => this.calcularPeso(p.criticidade);
+  //
+  //   const total = pacientes.reduce((acc, p) => acc + peso(p), 0);
+  //   const media = total / listaTecnicos.length;
+  //
+  //   let resultado: Tecnico[] = listaTecnicos.map(nome => ({
+  //     nome,
+  //     quartos: [],
+  //     totalPontos: 0
+  //   }));
+  //
+  //   // =====================================================
+  //   // 🔹 FASE 1 — DISTRIBUIÇÃO COM SCORE (CORRETA)
+  //   // =====================================================
+  //
+  //   pacientes.forEach(p => {
+  //
+  //     let melhor: Tecnico | null = null;
+  //     let melhorScore = Infinity;
+  //
+  //     for (const t of resultado) {
+  //
+  //       const ultimo = t.quartos[t.quartos.length - 1];
+  //
+  //       const distancia = ultimo ? Math.abs(p.quarto - ultimo.quarto) : 0;
+  //
+  //       // 🔥 penaliza distância (não bloqueia)
+  //       const penalidadeDist = distancia > LIMITE_DIST ? distancia * 2 : 0;
+  //
+  //       const novoTotal = t.totalPontos + peso(p);
+  //
+  //       const score =
+  //         Math.abs(novoTotal - media) + penalidadeDist;
+  //
+  //       if (score < melhorScore) {
+  //         melhorScore = score;
+  //         melhor = t;
+  //       }
+  //     }
+  //
+  //     // fallback (nunca deveria acontecer, mas segurança)
+  //     if (!melhor) {
+  //       melhor = resultado.sort((a, b) => a.totalPontos - b.totalPontos)[0];
+  //     }
+  //
+  //     melhor.quartos.push(p);
+  //     melhor.totalPontos += peso(p);
+  //   });
+  //
+  //   // =====================================================
+  //   // 🔹 UTIL
+  //   // =====================================================
+  //
+  //   const respeitaDist = (qs: Paciente[], limite = LIMITE_DIST) => {
+  //     for (let i = 1; i < qs.length; i++) {
+  //       if (Math.abs(qs[i].quarto - qs[i - 1].quarto) > limite) {
+  //         return false;
+  //       }
+  //     }
+  //     return true;
+  //   };
+  //
+  //   const diferenca = () => {
+  //     const pts = resultado.map(t => t.totalPontos);
+  //     return Math.max(...pts) - Math.min(...pts);
+  //   };
+  //
+  //   // =====================================================
+  //   // 🔹 FASE 2 — AJUSTE RÁPIDO
+  //   // =====================================================
+  //
+  //   for (let k = 0; k < 5; k++) {
+  //
+  //     for (let i = 0; i < resultado.length; i++) {
+  //       for (let j = 0; j < resultado.length; j++) {
+  //
+  //         if (i === j) continue;
+  //
+  //         const origem = resultado[i];
+  //         const destino = resultado[j];
+  //
+  //         if (origem.totalPontos <= media) continue;
+  //
+  //         const q = origem.quartos[origem.quartos.length - 1];
+  //         if (!q) continue;
+  //
+  //         const novaOrigem = origem.quartos.slice(0, -1);
+  //         const novoDestino = [...destino.quartos, q]
+  //           .sort((a, b) => a.quarto - b.quarto);
+  //
+  //         if (!respeitaDist(novaOrigem, 3) || !respeitaDist(novoDestino, 3)) continue;
+  //
+  //         const novoOrigemPts = origem.totalPontos - peso(q);
+  //         const novoDestinoPts = destino.totalPontos + peso(q);
+  //
+  //         const erroAtual =
+  //           Math.abs(origem.totalPontos - media) +
+  //           Math.abs(destino.totalPontos - media);
+  //
+  //         const erroNovo =
+  //           Math.abs(novoOrigemPts - media) +
+  //           Math.abs(novoDestinoPts - media);
+  //
+  //         if (erroNovo <= erroAtual) {
+  //           origem.quartos = novaOrigem;
+  //           destino.quartos = novoDestino;
+  //
+  //           origem.totalPontos = novoOrigemPts;
+  //           destino.totalPontos = novoDestinoPts;
+  //         }
+  //       }
+  //     }
+  //
+  //     if (diferenca() <= 2) break;
+  //   }
+  //
+  //   // =====================================================
+  //   // 🔹 FASE 3 — AJUSTE DIRECIONADO (GARANTE EQUILÍBRIO)
+  //   // =====================================================
+  //
+  //   for (let tentativa = 0; tentativa < 10; tentativa++) {
+  //
+  //     const ordenados = [...resultado].sort((a, b) => b.totalPontos - a.totalPontos);
+  //
+  //     const mais = ordenados[0];
+  //     const menos = ordenados[ordenados.length - 1];
+  //
+  //     const diff = mais.totalPontos - menos.totalPontos;
+  //
+  //     if (diff <= 2) break;
+  //
+  //     let moveFeito = false;
+  //
+  //     for (let i = mais.quartos.length - 1; i >= 0; i--) {
+  //
+  //       const q = mais.quartos[i];
+  //       const p = peso(q);
+  //
+  //       const novaOrigem = mais.quartos
+  //         .filter(x => x !== q)
+  //         .sort((a, b) => a.quarto - b.quarto);
+  //
+  //       const novoDestino = [...menos.quartos, q]
+  //         .sort((a, b) => a.quarto - b.quarto);
+  //
+  //       if (!respeitaDist(novaOrigem, 3) || !respeitaDist(novoDestino, 3)) continue;
+  //
+  //       const novoMais = mais.totalPontos - p;
+  //       const novoMenos = menos.totalPontos + p;
+  //
+  //       const erroAtual =
+  //         Math.abs(mais.totalPontos - media) +
+  //         Math.abs(menos.totalPontos - media);
+  //
+  //       const erroNovo =
+  //         Math.abs(novoMais - media) +
+  //         Math.abs(novoMenos - media);
+  //
+  //       if (erroNovo <= erroAtual) {
+  //         mais.quartos = novaOrigem;
+  //         menos.quartos = novoDestino;
+  //
+  //         mais.totalPontos = novoMais;
+  //         menos.totalPontos = novoMenos;
+  //
+  //         moveFeito = true;
+  //         break;
+  //       }
+  //     }
+  //
+  //     if (!moveFeito) break;
+  //   }
+  //
+  //   // =====================================================
+  //   // 🔹 FINAL
+  //   // =====================================================
+  //
+  //   resultado.forEach(t => {
+  //     t.quartos.sort((a, b) => a.quarto - b.quarto);
+  //   });
+  //
+  //   this.escalaGerada.set(resultado);
+  // }
+
+  calcularPeso(pontos: number): number {
+    if (pontos === 5) return 10;   // 🔴 Crítico
+    if (pontos === 3) return 3.5;  // 🟡 Médio
+    return 1;                      // 🟢 Leve
+  }
+
+  // gerarEscala() {
+  //   const listaTecnicos = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
+  //   if (listaTecnicos.length === 0) return;
+  //
+  //   let disponiveis = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto);
+  //   const getPeso = (p: any) => this.calcularPeso(p.criticidade);
+  //
+  //   const totalPesoCalculado = disponiveis.reduce((acc, p) => acc + getPeso(p), 0);
+  //   const mediaAlvo = totalPesoCalculado / listaTecnicos.length;
+  //
+  //   let resultado: any[] = listaTecnicos.map(nome => ({
+  //     nome,
+  //     quartos: [],
+  //     pontosCalculados: 0,
+  //     totalPontos: 0
+  //   }));
+  //
+  //   for (let i = 0; i < resultado.length; i++) {
+  //     let tecnico = resultado[i];
+  //
+  //     // Se for o último técnico, pega o resto
+  //     if (i === resultado.length - 1) {
+  //       tecnico.quartos = [...disponiveis];
+  //       disponiveis = [];
+  //       break;
+  //     }
+  //
+  //     while (disponiveis.length > 0) {
+  //       let p1 = disponiveis[0];
+  //
+  //       // Peso que ainda não foi distribuído
+  //       const pesoRestante = disponiveis.reduce((acc, p) => acc + getPeso(p), 0);
+  //       const tecnicosQueFaltam = listaTecnicos.length - i;
+  //       const mediaParaOsProximos = pesoRestante / tecnicosQueFaltam;
+  //
+  //       // REGRA DE PARADA:
+  //       // 1. O técnico já tem pelo menos 1 paciente.
+  //       // 2. Ele atingiu ou passou levemente da média alvo.
+  //       // 3. E o mais importante: se ele parar, a média dos próximos não fica "insuportável".
+  //       if (tecnico.quartos.length > 0 && tecnico.pontosCalculados >= (mediaAlvo - 1)) {
+  //
+  //         // Se a média do que sobrar for muito alta, ele CONTINUA pegando
+  //         if (mediaParaOsProximos > mediaAlvo + 1) {
+  //           // Continua pegando para ajudar o grupo...
+  //         } else {
+  //           break; // O pessoal da frente consegue segurar, ele para.
+  //         }
+  //       }
+  //
+  //       tecnico.quartos.push(p1);
+  //       tecnico.pontosCalculados += getPeso(p1);
+  //       disponiveis.shift();
+  //     }
+  //   }
+  //
+  //   // Ajuste Final: Se o último ficou muito leve (como a Roberta com 3 pts)
+  //   // Tentamos passar o primeiro quarto do técnico anterior para ele
+  //   const ultimo = resultado[resultado.length - 1];
+  //   const penultimo = resultado[resultado.length - 2];
+  //
+  //   if (ultimo && penultimo && (penultimo.pontosCalculados > ultimo.pontosCalculados + 5)) {
+  //     const qParaMover = penultimo.quartos.pop();
+  //     if (qParaMover) {
+  //       ultimo.quartos.unshift(qParaMover);
+  //       penultimo.pontosCalculados -= getPeso(qParaMover);
+  //       ultimo.pontosCalculados += getPeso(qParaMover);
+  //     }
+  //   }
+  //
+  //   // Soma final para exibição
+  //   resultado.forEach(t => {
+  //     t.quartos.sort((a: any, b: any) => a.quarto - b.quarto);
+  //     t.totalPontos = t.quartos.reduce((acc: number, p: any) => acc + p.criticidade, 0);
+  //   });
+  //
+  //   this.escalaGerada.set(resultado);
+  // }
+
   gerarEscala() {
-    const listaTecnicos = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
-    let disponiveis = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto);
-    const total = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
-    const mediaAlvo = total / listaTecnicos.length;
+    const listaTecnicos = this.tecnicosInput()
+      .split(',')
+      .map(n => n.trim())
+      .filter(n => n !== '');
 
-    let resultado: Tecnico[] = listaTecnicos.map(nome => ({ nome, quartos: [], totalPontos: 0 }));
+    if (listaTecnicos.length === 0) return;
 
-    resultado.forEach((tecnico, index) => {
-      if (index === listaTecnicos.length - 1) {
-        tecnico.quartos = [...disponiveis];
-        tecnico.totalPontos = disponiveis.reduce((acc, p) => acc + p.criticidade, 0);
-        return;
+    let pacientes = [...this.pacientes()]
+      .sort((a, b) => a.quarto - b.quarto);
+
+    const getPeso = (p: any) => this.calcularPeso(p.criticidade);
+
+    const totalPeso = pacientes.reduce((acc, p) => acc + getPeso(p), 0);
+    const media = totalPeso / listaTecnicos.length;
+
+    let resultado: any[] = listaTecnicos.map(nome => ({
+      nome,
+      quartos: [],
+      pontosCalculados: 0,
+      totalPontos: 0
+    }));
+
+    // =====================================================
+    // 🔥 FASE 1 — DISTRIBUIÇÃO PELO CENTRO
+    // =====================================================
+
+    // começa do meio
+    let esquerda = Math.floor((pacientes.length - 1) / 2);
+    let direita = esquerda + 1;
+
+    let lado = 0;
+
+    while (esquerda >= 0 || direita < pacientes.length) {
+
+      let p;
+
+      if (lado % 2 === 0 && esquerda >= 0) {
+        p = pacientes[esquerda--];
+      } else if (direita < pacientes.length) {
+        p = pacientes[direita++];
+      } else if (esquerda >= 0) {
+        p = pacientes[esquerda--];
       }
 
-      while (disponiveis.length > 0) {
-        const p1 = disponiveis[0];
-        const p2 = disponiveis[1];
-        const p3 = disponiveis[2];
+      lado++;
 
-        // LOGICA DE SALTO RESTRITA (Só pula 1 quarto e se for vantajoso)
-        if (p1 && p2 && p3) {
-          const erroSequencial = Math.abs((tecnico.totalPontos! + p1.criticidade + p2.criticidade) - mediaAlvo);
-          const erroComSalto = Math.abs((tecnico.totalPontos! + p1.criticidade + p3.criticidade) - mediaAlvo);
+      if (!p) continue;
 
-          // Só pula se o salto for MUITO melhor (pelo menos 2 pontos de diferença)
-          // E se o técnico não estourar a média demais
-          if (erroComSalto < (erroSequencial - 1) && (tecnico.totalPontos! + p1.criticidade + p3.criticidade) <= mediaAlvo + 1) {
-            tecnico.quartos!.push(p1, p3);
-            tecnico.totalPontos! += (p1.criticidade + p3.criticidade);
-            disponiveis.splice(0, 3);
-            disponiveis.unshift(p2); // Devolve o Q2 para o próximo técnico
+      // escolhe melhor técnico (menos carregado)
+      let melhor = resultado.sort((a, b) => a.pontosCalculados - b.pontosCalculados)[0];
 
-            // APÓS UM SALTO, O TÉCNICO DEVE PARAR.
-            // Isso garante que ele não "pule" de novo e bagunce o corredor.
-            break;
-          }
-        }
+      melhor.quartos.push(p);
+      melhor.pontosCalculados += getPeso(p);
+    }
 
-        // LOGICA DE PARADA (Para manter os setores juntos)
-        const erroAtual = Math.abs(tecnico.totalPontos! - mediaAlvo);
-        const erroComProximo = Math.abs((tecnico.totalPontos! + p1.criticidade) - mediaAlvo);
+    // =====================================================
+    // 🔥 FASE 2 — AJUSTE INTELIGENTE (permite Q1 ir pra Roberta)
+    // =====================================================
 
-        // Se adicionar o próximo piora a média, ele para aqui e o próximo técnico assume a sequência
-        if (tecnico.totalPontos! > 0 && erroComProximo > erroAtual) {
+    for (let t = 0; t < 10; t++) {
+
+      const ordenados = [...resultado].sort((a, b) => b.pontosCalculados - a.pontosCalculados);
+
+      const mais = ordenados[0];
+      const menos = ordenados[ordenados.length - 1];
+
+      const diff = mais.pontosCalculados - menos.pontosCalculados;
+      if (diff <= 2) break;
+
+      let moveFeito = false;
+
+      for (const q of [...mais.quartos]) {
+
+        const peso = getPeso(q);
+
+        const novoMais = mais.pontosCalculados - peso;
+        const novoMenos = menos.pontosCalculados + peso;
+
+        const erroAtual =
+          Math.abs(mais.pontosCalculados - media) +
+          Math.abs(menos.pontosCalculados - media);
+
+        const erroNovo =
+          Math.abs(novoMais - media) +
+          Math.abs(novoMenos - media);
+
+        if (erroNovo <= erroAtual) {
+
+          mais.quartos = mais.quartos.filter((x: Paciente) => x !== q);
+          menos.quartos.push(q);
+
+          mais.pontosCalculados = novoMais;
+          menos.pontosCalculados = novoMenos;
+
+          moveFeito = true;
           break;
         }
-
-        tecnico.quartos!.push(p1);
-        tecnico.totalPontos! += p1.criticidade;
-        disponiveis.shift();
       }
+
+      if (!moveFeito) break;
+    }
+
+    // =====================================================
+    // 🔹 FINAL
+    // =====================================================
+
+    resultado.forEach(t => {
+      t.quartos.sort((a: any, b: any) => a.quarto - b.quarto);
+      t.totalPontos = t.quartos.reduce((acc: number, p: any) => acc + p.criticidade, 0);
     });
 
     this.escalaGerada.set(resultado);

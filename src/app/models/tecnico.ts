@@ -2,6 +2,6 @@ import {Paciente} from './paciente';
 
 export interface Tecnico {
   nome: string;
-  quartos?: Paciente[];
-  totalPontos?: number;
+  quartos: Paciente[];
+  totalPontos: number;
 }
