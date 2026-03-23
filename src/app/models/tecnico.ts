@@ -4,4 +4,5 @@ export interface Tecnico {
   nome: string;
   quartos: Paciente[];
   totalPontos: number;
+  pontosCalculados: number;
 }

@@ -1,3 +1,163 @@
+<!--<div class="container">-->
+<!--  <div class="spanH1">-->
+<!--    <h1>Escala Inteligente</h1>-->
+<!--    <h4>Enfermagem</h4>-->
+<!--  </div>-->
+
+<!--  <section class="config">-->
+<!--    <h3>1. Técnicos</h3>-->
+<!--    <div class="form-container-stack">-->
+<!--      <div class="field">-->
+<!--        <label>Nomes (Separados por vírgula)</label>-->
+<!--        <input-->
+<!--          type="text"-->
+<!--          [(ngModel)]="tecnicosInput"-->
+<!--          placeholder="Ex: Maria, José, Joana"-->
+<!--          (input)="formatarTecnicos()"-->
+<!--        >-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </section>-->
+
+<!--  <section class="cadastro">-->
+<!--    <h3>2. Adicionar Paciente</h3>-->
+<!--    <div class="form-container-stack">-->
+<!--      <div class="row-dupla">-->
+<!--        <div class="field">-->
+<!--          <label>Quarto</label>-->
+<!--          <select [(ngModel)]="novoQuarto">-->
+<!--            <option *ngFor="let n of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="n">Q{{ n }}</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--        <div class="field">-->
+<!--          <label>Criticidade</label>-->
+<!--          <select [(ngModel)]="novaCriticidade">-->
+<!--            <option [ngValue]="1">Leve (1)</option>-->
+<!--            <option [ngValue]="3">Médio (3)</option>-->
+<!--            <option [ngValue]="5">Crítico (5)</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="row-unica">-->
+<!--        <div class="field">-->
+<!--          <label>Nome do Paciente</label>-->
+<!--          <input type="text" class="nomePaciente" [(ngModel)]="novoNome" (input)="formatarNome()"-->
+<!--                 placeholder="Nome Completo">-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="row-botao">-->
+<!--        <button (click)="adicionarPaciente()" class="btn-addPaciente">Adicionar à Lista</button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </section>-->
+
+<!--  <section class="lista-pacientes">-->
+<!--    <h3>3. Lista de Espera</h3>-->
+<!--    @for (p of pacientes(); track p.quarto; let i = $index) {-->
+<!--      <div class="paciente-card" [attr.data-crit]="p.criticidade">-->
+
+<!--        <div class="paciente-conteudo-flex">-->
+<!--          <span class="quarto-prefix"><b>Q{{ p.quarto }}</b> - </span>-->
+
+<!--          <input-->
+<!--            type="text"-->
+<!--            class="paciente-nome-input"-->
+<!--            [value]="p.nome"-->
+<!--            readonly-->
+<!--            title="{{p.nome}}">-->
+<!--        </div>-->
+
+<!--        <div class="actions-card">-->
+<!--          <button (click)="abrirEdicao(p, i)" class="btn-edit" title="Editar">-->
+<!--            <span class="material-symbols-outlined edit">edit</span>-->
+<!--          </button>-->
+<!--          <button (click)="removerPaciente(i)" class="btn-delete" title="Excluir">-->
+<!--            <span class="material-symbols-outlined">delete</span>-->
+<!--          </button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    } @empty {-->
+<!--      <div class="empty-state">-->
+<!--        <p>Nenhum paciente na lista.</p>-->
+<!--      </div>-->
+<!--    }-->
+<!--  </section>-->
+
+<!--  <div class="row-actions">-->
+<!--    <button class="btn-gerar" (click)="gerarEscala()" [disabled]="pacientes().length === 0">-->
+<!--      Gerar Escala-->
+<!--    </button>-->
+<!--    <button class="btn-limpar" (click)="limparEscala()" [disabled]="escalaGerada().length === 0">-->
+<!--      Limpar Escala-->
+<!--    </button>-->
+<!--  </div>-->
+
+<!--  <section class="resultado">-->
+<!--    @if (escalaGerada().length > 0) {-->
+<!--      @for (t of escalaGerada(); track t.nome) {-->
+<!--        <div class="tecnico-col">-->
+<!--          <h4>-->
+<!--            {{ t.nome }}-->
+<!--            <span class="badge">{{ t.totalPontos }} PTS</span>-->
+<!--          </h4>-->
+<!--          <ul>-->
+<!--            @for (q of t.quartos; track q.quarto) {-->
+<!--              <li class="quarto-item">-->
+<!--                <div class="quarto-info">-->
+<!--                  <span class="quarto-numero">Q{{ q.quarto }}</span>-->
+<!--                  <span class="paciente-nome">{{ q.nome }}</span>-->
+<!--                </div>-->
+<!--                <span class="badge-crit" [attr.data-crit]="q.criticidade">-->
+<!--                  {{ q.criticidade }} pt{{ q.criticidade > 1 ? 's' : '' }}-->
+<!--                </span>-->
+<!--              </li>-->
+<!--            }-->
+<!--          </ul>-->
+<!--        </div>-->
+<!--      }-->
+<!--    }-->
+<!--  </section>-->
+
+<!--  <button class="btn-whatsapp" *ngIf="escalaGerada().length > 0" (click)="compartilharWhatsApp()">-->
+<!--    <img src="assets/wap.png" alt="WhatsApp" class="icon-wap">-->
+<!--    <span>Enviar Escala por WhatsApp</span>-->
+<!--  </button>-->
+
+<!--  @if (editandoPaciente()) {-->
+<!--    <div class="modal-overlay">-->
+<!--      <div class="modal-content">-->
+<!--        <h3>Editar Paciente</h3>-->
+<!--        <div class="field">-->
+<!--          <label>Nome</label>-->
+<!--          <input type="text" [(ngModel)]="editandoPaciente()!.nome" (input)="formatarNome(editandoPaciente())">-->
+<!--        </div>-->
+<!--        <div class="row-dupla">-->
+<!--          <div class="field">-->
+<!--            <label>Quarto</label>-->
+<!--            <select [(ngModel)]="editandoPaciente()!.quarto">-->
+<!--              <option *ngFor="let n of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="n">Q{{ n }}</option>-->
+<!--            </select>-->
+<!--          </div>-->
+<!--          <div class="field">-->
+<!--            <label>Criticidade</label>-->
+<!--            <select [(ngModel)]="editandoPaciente()!.criticidade">-->
+<!--              <option [ngValue]="1">Leve (1)</option>-->
+<!--              <option [ngValue]="3">Médio (3)</option>-->
+<!--              <option [ngValue]="5">Crítico (5)</option>-->
+<!--            </select>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="modal-actions">-->
+<!--          <button class="btn-cancelar" (click)="fecharEdicao()">Cancelar</button>-->
+<!--          <button class="btn-salvar" (click)="salvarEdicao()">Salvar e Gerar</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  }-->
+<!--</div>-->
+
 <div class="container">
   <div class="spanH1">
     <h1>Escala Inteligente</h1>
@@ -13,7 +173,6 @@
           type="text"
           [(ngModel)]="tecnicosInput"
           placeholder="Ex: Maria, José, Joana"
-          (input)="formatarTecnicos()"
         >
       </div>
     </div>
@@ -22,12 +181,13 @@
   <section class="cadastro">
     <h3>2. Adicionar Paciente</h3>
     <div class="form-container-stack">
-
       <div class="row-dupla">
         <div class="field">
           <label>Quarto</label>
           <select [(ngModel)]="novoQuarto">
-            <option *ngFor="let n of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="n">Q{{ n }}</option>
+            @for (n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track n) {
+              <option [ngValue]="n">Q{{ n }}</option>
+            }
           </select>
         </div>
         <div class="field">
@@ -43,31 +203,34 @@
       <div class="row-unica">
         <div class="field">
           <label>Nome do Paciente</label>
-          <input type="text"
-                 class="nomePaciente"
-                 [(ngModel)]="novoNome"
-                 (input)="formatarNome()"
+          <input type="text" class="nomePaciente" [(ngModel)]="novoNome" (input)="formatarNome()"
                  placeholder="Nome Completo">
         </div>
       </div>
 
       <div class="row-botao">
-        <button (click)="adicionarPaciente()" class="btn-addPaciente">
-          Adicionar à Lista
-        </button>
+        <button (click)="adicionarPaciente()" class="btn-addPaciente">Adicionar à Lista</button>
       </div>
-
     </div>
   </section>
 
   <section class="lista-pacientes">
+    <h3>3. Lista de Espera</h3>
     @for (p of pacientes(); track p.quarto; let i = $index) {
       <div class="paciente-card" [attr.data-crit]="p.criticidade">
-        <span><b>Q{{ p.quarto }}</b> - {{ p.nome }}</span>
+        <div class="paciente-conteudo-flex">
+          <span class="quarto-prefix"><b>Q{{ p.quarto }}</b> - </span>
+          <input type="text" class="paciente-nome-input" [value]="p.nome" readonly title="{{p.nome}}">
+        </div>
 
-        <button (click)="removerPaciente(i)" class="btn-delete">
-          <span class="material-symbols-outlined">delete</span>
-        </button>
+        <div class="actions-card">
+          <button (click)="abrirEdicao(p, i)" class="btn-edit" title="Editar">
+            <span class="material-symbols-outlined edit">edit</span>
+          </button>
+          <button (click)="removerPaciente(i)" class="btn-delete" title="Excluir">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
       </div>
     } @empty {
       <div class="empty-state">
@@ -76,46 +239,53 @@
     }
   </section>
 
-  <!--  <button class="btn-gerar" (click)="gerarEscala()">Gerar Escala Inteligente</button>-->
   <div class="row-actions">
-    <button class="btn-gerar"
-            (click)="gerarEscala()"
-            [disabled]="pacientes().length === 0">
-      Gerar Escala
-    </button>
+    <button
+      class="btn-gerar"
+      [class.btn-regerar]="escalaGerada().length > 0"
+      (click)="gerarEscala()"
+      [disabled]="pacientes().length === 0">
 
-    <button class="btn-limpar"
-            (click)="limparEscala()"
-            [disabled]="escalaGerada().length === 0">
+      {{ escalaGerada().length > 0 ? 'Regerar Escala' : 'Gerar Escala' }}
+
+    </button>
+    <button class="btn-limpar" (click)="limparEscala()" [disabled]="escalaGerada().length === 0">
       Limpar Escala
     </button>
   </div>
 
-  <section class="resultado">
+  <section class="resultado" cdkDropListGroup>
     @if (escalaGerada().length > 0) {
       @for (t of escalaGerada(); track t.nome) {
         <div class="tecnico-col">
           <h4>
             {{ t.nome }}
-            <span class="badge">
-            {{ t.totalPontos }} {{ t.totalPontos === 1 ? 'PT' : 'PTS' }}
-          </span>
+            <span class="badge">{{ t.totalPontos }} PTS</span>
           </h4>
 
-          <ul>
+          <ul
+            cdkDropList
+            [cdkDropListData]="t.quartos"
+            (cdkDropListDropped)="drop($event)"
+            class="lista-drag-area">
+
             @for (q of t.quartos; track q.quarto) {
-              <li class="quarto-item">
+              <li class="quarto-item" cdkDrag [cdkDragStartDelay]="200">
+
+                <div class="custom-placeholder" *cdkDragPlaceholder></div>
+
                 <div class="quarto-info">
                   <span class="quarto-numero">Q{{ q.quarto }}</span>
                   <span class="paciente-nome">{{ q.nome }}</span>
                 </div>
 
                 <span class="badge-crit" [attr.data-crit]="q.criticidade">
-                {{ q.criticidade }} {{ q.criticidade === 1 ? 'pt' : 'pts' }}
-              </span>
+                  {{ q.criticidade }} pt{{ q.criticidade > 1 ? 's' : '' }}
+                </span>
+                <span class="material-symbols-outlined drag-handle" cdkDragHandle>
+                  drag_indicator
+                </span>
               </li>
-            } @empty {
-              <li class="quarto-item">Nenhum quarto atribuído</li>
             }
           </ul>
         </div>
@@ -124,8 +294,41 @@
   </section>
 
   <button class="btn-whatsapp" *ngIf="escalaGerada().length > 0" (click)="compartilharWhatsApp()">
-    <img src="/escala-inteligente/public/wap.png" alt="Ícone WhatsApp" class="icon-wap">
+    <img src="/escala-inteligente/public/wap.png" alt="WhatsApp" class="icon-wap">
     <span>Enviar Escala por WhatsApp</span>
   </button>
 
+  @if (editandoPaciente()) {
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <h3>Editar Paciente</h3>
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" [(ngModel)]="editandoPaciente()!.nome" (input)="formatarNome(editandoPaciente())">
+        </div>
+        <div class="row-dupla">
+          <div class="field">
+            <label>Quarto</label>
+            <select [(ngModel)]="editandoPaciente()!.quarto">
+              @for (n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track n) {
+                <option [ngValue]="n">Q{{ n }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label>Criticidade</label>
+            <select [(ngModel)]="editandoPaciente()!.criticidade">
+              <option [ngValue]="1">Leve (1)</option>
+              <option [ngValue]="3">Médio (3)</option>
+              <option [ngValue]="5">Crítico (5)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancelar" (click)="fecharEdicao()">Cancelar</button>
+          <button class="btn-salvar" (click)="salvarEdicao()">Salvar e Gerar</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

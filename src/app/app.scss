@@ -17,7 +17,7 @@ $text-muted     : #A0AEC0; // Para labels e dicas
 // Auxiliares
 $whatsapp-green : #25D366;
 $whatsapp-dark  : #128C7E;
-$danger-light   : #FFF5F5; // Rosa ultra suave para o botão Limpar
+$danger-light   : #fcd7d7; // Rosa ultra suave para o botão Limpar
 $danger-dark    : #C53030; // Vermelho profundo para contraste de texto
 
 // ============================================================
@@ -179,7 +179,7 @@ h3
 .paciente-card
 {
   background      : $white;
-  padding         : 16px;
+  padding         : 14px 5px 14px 14px;
   margin-bottom   : 10px;
   display         : flex;
   align-items     : center;
@@ -235,9 +235,65 @@ h3
     .material-symbols-outlined
     {
       color     : $danger;
-      font-size : 1.2rem;
+      font-size : 1.4rem;
+    }
+
+    .edit
+    {
+      color : #636363;
     }
   }
+}
+
+.paciente-conteudo-flex
+{
+  display     : flex;
+  align-items : center;
+  flex        : 1;
+  min-width   : 0; /* Importante: permite que o flex child encolha para ativar o scroll */
+  overflow    : hidden;
+
+  .quarto-prefix
+  {
+    white-space  : nowrap;
+    margin-right : 5px;
+    flex-shrink  : 0; /* Não deixa o "Q1 -" encolher */
+  }
+}
+
+.paciente-nome-input
+{
+  border      : none;
+  background  : transparent;
+  font-size   : 0.95rem;
+  font-weight : 600;
+  color       : $text-main;
+  padding     : 0;
+  cursor      : default;
+  min-width   : 100%;
+
+  /* Habilita scroll lateral */
+  overflow-x  : auto;
+  white-space : nowrap;
+
+  /* Esconde a barra de rolagem (visual limpo) */
+  &::-webkit-scrollbar
+  {
+    display : none;
+  }
+
+  &:focus
+  {
+    outline : none;
+  }
+}
+
+.actions-card
+{
+  display     : flex;
+  align-items : center;
+  flex-shrink : 0; /* IMPEDE que os botões saiam da tela ou encolham */
+  gap         : 5px;
 }
 
 // ============================================================
@@ -272,14 +328,30 @@ h3
     }
   }
 
+  // No seu arquivo SCSS, procure pela classe .btn-gerar
   .btn-gerar
   {
-    background-color : $primary;
+    background-color : $primary; // O azul atual
     color            : $white;
+    border-radius    : 30px;
+    transition       : all 0.3s ease; // Adicione uma transição suave para a troca de cor
 
     &:hover:not(:disabled)
     {
       background-color : $primary-dark;
+    }
+
+    // NOVA CLASSE: Quando a escala já existe
+    &.btn-regerar
+    {
+      background-color : #315aea; // Um Laranja vibrante (pode usar $warning se preferir)
+      border           : none;
+      box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
+
+      &:hover:not(:disabled)
+      {
+        background-color : darken(#315aea, 10%);
+      }
     }
   }
 
@@ -288,6 +360,8 @@ h3
     background-color : $danger-light;
     color            : $danger-dark;
     border           : 1px solid rgba($danger-dark, 0.1);
+    border-radius    : 30px;
+    box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
 
     &:hover:not(:disabled)
     {
@@ -399,60 +473,211 @@ h3
 // ============================================================
 //  9. INFO
 // ============================================================
-.quarto-item {
-  display: flex;
-  justify-content: start;
-  padding: 10px 0;
-  border-bottom: 1px solid #EDF2F7; // Linha divisória sutil
-  list-style: none;
+.quarto-item
+{
+  display         : flex;
+  justify-content : start;
+  padding         : 10px 0;
+  border-bottom   : 1px solid #EDF2F7; // Linha divisória sutil
+  list-style      : none;
 
-  &:last-child { border-bottom: none; }
+  &:last-child
+  {
+    border-bottom : none;
+  }
 
-  .quarto-info {
-    display: flex;
-    align-items: start;
-    gap: 4px;
+  .quarto-info
+  {
+    display     : flex;
+    align-items : start;
+    gap         : 4px;
 
-    .quarto-numero {
-      font-weight: 800;
-      color: $primary;
-      font-size: 0.9rem;
-      min-width: 1.5rem;
+    .quarto-numero
+    {
+      font-weight : 800;
+      color       : $primary;
+      font-size   : 0.9rem;
+      min-width   : 1.5rem;
     }
 
-    .paciente-nome {
-      color: $text-body;
-      font-weight: 400;
-      font-size: 0.95rem;
+    .paciente-nome
+    {
+      color       : $text-body;
+      font-weight : 400;
+      font-size   : 0.95rem;
     }
   }
 
   // Estilo das Etiquetas (Badges)
-  .badge-crit {
-    font-size: 0.7rem;
-    font-weight: 800;
-    padding: 4px 8px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    margin-left: 8px;
+  .badge-crit
+  {
+    font-size      : 0.7rem;
+    font-weight    : 800;
+    padding        : 4px 8px;
+    border-radius  : 20px;
+    text-transform : uppercase;
+    margin-left    : 8px;
 
-    &[data-crit="5"] {
-      background-color: rgba($danger, 0.1);
-      color: $danger;
+    &[data-crit="5"]
+    {
+      background-color : rgba($danger, 0.1);
+      color            : $danger;
     }
-    &[data-crit="3"] {
-      background-color: rgba($warning, 0.1);
-      color: darken($warning, 20%);
+
+    &[data-crit="3"]
+    {
+      background-color : rgba($warning, 0.1);
+      color            : darken($warning, 20%);
     }
-    &[data-crit="1"] {
-      background-color: rgba($success, 0.1);
-      color: $success;
+
+    &[data-crit="1"]
+    {
+      background-color : rgba($success, 0.1);
+      color            : $success;
     }
   }
 }
 
 // ============================================================
-// 10. MEDIA QUERY (OTIMIZAÇÃO DESKTOP / SAMSUNG BOOK)
+// 10. MODAL DE EDIÇÃO
+// ============================================================
+
+/* Overlay: Fundo escurecido que ocupa toda a tela */
+.modal-overlay
+{
+  position         : fixed;
+  top              : 0;
+  left             : 0;
+  width            : 100vw;
+  height           : 100vh;
+  background-color : rgba(0, 0, 0, 0.6); /* Fundo preto transparente */
+  display          : flex;
+  justify-content  : center; /* Centraliza horizontalmente */
+  align-items      : center; /* Centraliza verticalmente */
+  z-index          : 1000; /* Garante que fique por cima de tudo */
+  backdrop-filter  : blur(3px); /* Efeito de desfoque no fundo (opcional, moderno) */
+}
+
+/* Content: O "card" branco do modal */
+.modal-content
+{
+  background-color : #ffffff;
+  padding          : 2.5rem; /* Espaçamento interno generoso */
+  border-radius    : 15px; /* Bordas arredondadas */
+  width            : 90%;
+  max-width        : 450px; /* Largura máxima confortável */
+  box-shadow       : 0 10px 30px rgba(0, 0, 0, 0.25); /* Sombra para dar profundidade */
+  animation        : modalEntrada 0.3s ease-out; /* Animação suave de entrada */
+}
+
+.modal-content h3
+{
+  margin-top     : 0;
+  margin-bottom  : 1.5rem;
+  color          : #333;
+  font-size      : 1.5rem;
+  border-bottom  : 2px solid #eee;
+  padding-bottom : 0.5rem;
+}
+
+/* Container de botões no final do modal */
+.modal-actions
+{
+  display         : flex;
+  justify-content : flex-end; /* Botões para a direita */
+  gap             : 12px;
+  margin-top      : 2.5rem;
+}
+
+/* ===================================================== */
+/* 🔹 AJUSTE DOS CAMPOS (FIELDS) DENTRO DO MODAL */
+/* ===================================================== */
+
+.modal-content .field
+{
+  margin-bottom : 1.2rem;
+}
+
+.modal-content label
+{
+  display       : block;
+  margin-bottom : 0.5rem;
+  font-weight   : bold;
+  color         : #555;
+}
+
+.modal-content input,
+.modal-content select
+{
+  width         : 100%;
+  padding       : 10px 12px;
+  border        : 1px solid #ddd;
+  border-radius : 8px;
+  font-size     : 1rem;
+}
+
+/* ===================================================== */
+/* 🔹 ESTILO DOS BOTÕES DO MODAL (SEGUINDO O APP) */
+/* ===================================================== */
+
+.btn-cancelar
+{
+  background-color : $danger-light;
+  color            : $danger-dark;
+  border           : none;
+  font-size        : 1.4rem;
+  cursor           : pointer;
+  padding          : 10px 20px;
+  border-radius    : 8px;
+}
+
+.btn-salvar
+{
+  background-color : #2196F3; /* Azul (mesmo do gerar) */
+  color            : white;
+  border           : none;
+  padding          : 10px 20px;
+  border-radius    : 8px;
+  cursor           : pointer;
+}
+
+.btn-salvar, .btn-cancelar
+{
+  font-size : 1rem;
+}
+
+/* ===================================================== */
+/* 🔹 ESTRUTURA GERAL (PARA GARANTIR NO SEU CSS) */
+/* ===================================================== */
+
+.row-dupla
+{
+  display : flex;
+  gap     : 15px;
+}
+
+.row-dupla .field
+{
+  flex : 1; /* Divide o espaço igual */
+}
+
+/* Animação opcional para o modal entrar */
+@keyframes modalEntrada
+{
+  from
+  {
+    opacity   : 0;
+    transform : translateY(-20px);
+  }
+  to
+  {
+    opacity   : 1;
+    transform : translateY(0);
+  }
+}
+
+// ============================================================
+// 11. MEDIA QUERY (OTIMIZAÇÃO DESKTOP / SAMSUNG BOOK)
 // ============================================================
 @media (min-width : 768px)
 {
@@ -471,3 +696,168 @@ h3
   }
 }
 
+// ============================================================
+// 11. DRAG & DROP REFINADO (MOBILE & DESKTOP)
+// ============================================================
+
+/* O Card em estado normal */
+// No seu arquivo .scss
+
+.quarto-item
+{
+  display             : flex;
+  align-items         : center;
+  /* MUDANÇA: Justify-content: start; -> Justify-content: normal; (O padrão) */
+  justify-content     : normal; // Deixe o flex cuidar do espaço
+  padding             : 12px;
+  background-color    : $white;
+  border-bottom       : 1px solid #EDF2F7;
+
+  transition          : transform 200ms cubic-bezier(0, 0, 0.2, 1), box-shadow 200ms;
+  touch-action        : pan-y;
+  user-select         : none;
+  -webkit-user-select : none;
+
+  cursor              : grab;
+
+  &:last-child
+  {
+    border-bottom : none;
+  }
+
+  &:hover
+  {
+    background-color : #F8FAFC;
+    box-shadow       : 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  // Se você já estiver usando o handle, o cursor: grab deve ir para o handle, não para o card.
+  // Neste exemplo, vou assumir que você está usando o handle.
+}
+
+/* 1. Mudei o cursor do card inteiro para não atrapalhar o scroll no mobile */
+.quarto-item
+{
+  cursor : default;
+}
+
+/* 2. Estilo dos Pontos (Badges) */
+.badge-crit
+{
+  /* ... seus estilos anteriores ... */
+  font-size      : 0.7rem;
+  font-weight    : 800;
+  padding        : 4px 8px;
+  border-radius  : 20px;
+  text-transform : uppercase;
+  margin-right   : 8px; // Dê um espaço para o ícone
+}
+
+/* 3. O SEGREDO ESTÁ AQUI: Empurrar o ícone para a direita */
+/* Vamos usar um "flex-spacer" invisível antes do ícone */
+.quarto-item .quarto-info
+{
+  flex : 1;
+}
+
+/* 4. O Ícone de Arrasto (Handle) */
+.drag-handle
+{
+  cursor       : grab;
+  color        : $text-muted;
+  padding      : 12px;
+  /* MUDANÇA: margin-right: 10px; -> margin-left: auto; */
+  margin-left  : auto; // Isso empurra o ícone totalmente para a direita
+  display      : flex;
+  align-items  : center;
+  touch-action : none !important;
+
+  &:active
+  {
+    cursor : grabbing;
+  }
+}
+
+/* O Ícone de Arrasto */
+.drag-handle
+{
+  cursor      : grab;
+  color       : $text-muted;
+  padding     : 4px;
+  display     : flex;
+  align-items : end;
+  margin-top  : -5px;
+
+  &:active
+  {
+    cursor : grabbing;
+  }
+}
+
+/* A Lista de Destino (Área de Drop) */
+.lista-drag-area
+{
+  min-height : 60px; // Garante que a lacuna abra mesmo se a lista estiver quase vazia
+  background : transparent;
+  display    : block;
+}
+
+/* 1. PREVIEW: O card que está "voando" com o dedo/mouse */
+.cdk-drag-preview
+{
+  box-sizing       : border-box;
+  border-radius    : 12px;
+  background-color : $white !important;
+  box-shadow       : 0 15px 30px rgba(0, 0, 0, 0.15);
+  display          : flex;
+  align-items      : center;
+  padding          : 12px;
+  border           : 1px solid rgba($primary, 0.2);
+  z-index          : 2000 !important;
+
+  // Garante que o texto apareça
+  color            : $text-main;
+
+  .quarto-numero
+  {
+    font-weight  : 800;
+    color        : $primary;
+    margin-right : 10px;
+  }
+
+  .badge-crit
+  {
+    margin-left : auto;
+  }
+}
+
+/* 2. PLACEHOLDER: A lacuna (espaço vazio) que se abre na lista */
+.cdk-drag-placeholder
+{
+  background    : #E2E8F0 !important;
+  border        : 2px dashed $text-muted !important;
+  min-height    : 50px;
+  border-radius : 8px;
+  margin        : 5px 0;
+  opacity       : 0.5;
+  transition    : transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* 3. ANIMAÇÃO: Suaviza a abertura da lacuna quando outros itens se movem */
+.cdk-drop-list-dragging .quarto-item:not(.cdk-drag-placeholder)
+{
+  transition : transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Ajuste no Preview para o texto não sumir */
+.cdk-drag-preview .quarto-info
+{
+  display : flex;
+  gap     : 8px;
+
+  .paciente-nome
+  {
+    color       : $text-body;
+    font-weight : 600;
+  }
+}
