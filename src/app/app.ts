@@ -22,7 +22,6 @@ export class App implements OnInit {
   escalaGerada = signal<Tecnico[]>([]);
   editandoPaciente = signal<any | null>(null);
   indiceEditando = -1;
-
   novoNome = '';
   novoQuarto: number = 1;
   novaCriticidade: 1 | 3 | 5 = 1;
@@ -203,48 +202,61 @@ export class App implements OnInit {
   }
 
   calcularPeso(pontos: number): number {
-    if (pontos === 5) return 3;
-    if (pontos === 3) return 2;
-    return 1;
+    if (pontos === 5) return 4; // Crítico vale por 2 Médios ou 4 Leves
+    if (pontos === 3) return 2; // Médio vale por 2 Leves
+    return 1;                   // Leve é a unidade básica
   }
 
   gerarEscala() {
     const nomes = this.tecnicosInput().split(',').map(n => n.trim()).filter(n => n !== '');
     if (nomes.length === 0 || this.pacientes().length === 0) return;
 
-    let pacientesDisponiveis = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto);
-    const totalPeso = pacientesDisponiveis.reduce((acc, p) => acc + this.calcularPeso(p.criticidade), 0);
-    const mediaAlvo = totalPeso / nomes.length;
+    const pacientesDisponiveis = [...this.pacientes()].sort((a, b) => a.quarto - b.quarto);
+
+    // Calculamos o esforço total baseado na nova escala 1, 2, 4
+    const esforcoTotal = pacientesDisponiveis.reduce((acc, p) => acc + this.calcularPeso(p.criticidade), 0);
+    const mediaEsforcoAlvo = esforcoTotal / nomes.length;
 
     let resultado = nomes.map(nome => ({
       nome,
       quartos: [] as any[],
-      pontosCalculados: 0,
-      totalPontos: 0
+      pontosCalculados: 0, // Peso para o algoritmo (1, 2, 4)
+      totalPontos: 0      // Pontos para exibição (1, 3, 5)
     }));
 
     let tecnicoIndex = 0;
 
-    for (const p of pacientesDisponiveis) {
+    for (let i = 0; i < pacientesDisponiveis.length; i++) {
+      const p = pacientesDisponiveis[i];
+      const pesoEsforco = this.calcularPeso(p.criticidade);
       let tecnicoAtual = resultado[tecnicoIndex];
-      const pesoP = this.calcularPeso(p.criticidade);
 
-      if (tecnicoIndex < nomes.length - 1 && tecnicoAtual.quartos.length > 0) {
-        const carga = tecnicoAtual.pontosCalculados;
+      // Se não for o último técnico, decidimos se passamos o paciente para o próximo
+      if (tecnicoIndex < nomes.length - 1) {
+        const cargaAtual = tecnicoAtual.pontosCalculados;
 
-        // Regra de Ouro: Se a soma estoura a média, passa para o próximo
-        if (carga >= mediaAlvo || (carga + pesoP > mediaAlvo && tecnicoAtual.quartos.length >= 2)) {
+        // Qual o erro (distância da média) se o paciente ficar aqui?
+        const erroSeFicar = Math.abs((cargaAtual + pesoEsforco) - mediaEsforcoAlvo);
+
+        // Qual o erro se passarmos para o próximo (fechando a conta deste técnico agora)?
+        const erroSePassar = Math.abs(cargaAtual - mediaEsforcoAlvo);
+
+        // Se parar agora deixar o técnico MAIS PERTO da média do que adicionar o paciente,
+        // e se o técnico já tiver pelo menos um paciente, passamos a vez.
+        if (cargaAtual > 0 && erroSePassar < erroSeFicar) {
           tecnicoIndex++;
           tecnicoAtual = resultado[tecnicoIndex];
         }
       }
 
       tecnicoAtual.quartos.push(p);
-      tecnicoAtual.pontosCalculados += pesoP;
+      tecnicoAtual.pontosCalculados += pesoEsforco;
     }
 
+    // Finalização para exibição
     resultado.forEach(t => {
       t.quartos.sort((a, b) => a.quarto - b.quarto);
+      // Aqui mostramos a soma real (1, 3, 5) para a Luciene ver no app
       t.totalPontos = t.quartos.reduce((acc, p) => acc + p.criticidade, 0);
     });
 
@@ -277,8 +289,8 @@ export class App implements OnInit {
     }
   }
 
-// Extraia a lógica de Capitalize para não repetir código
-  private aplicarCapitalize(valor: string): string {
+  // Extraia a lógica de Capitalize para não repetir código
+  aplicarCapitalize(valor: string): string {
     return valor
       .toLowerCase()
       .split(' ')

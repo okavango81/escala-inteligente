@@ -10,7 +10,7 @@ $bg-body        : #F0F4F8; // Cinza azulado ultra claro
 $white          : #FFFFFF;
 
 // Cores de Texto
-$text-main      : #2D3748; // Cinza escuro para títulos
+$text-main      : #506a9c; // Cinza escuro para títulos
 $text-body      : #4A5568; // Cinza médio para textos
 $text-muted     : #A0AEC0; // Para labels e dicas
 
@@ -336,7 +336,6 @@ h3
     color            : $white;
     border-radius    : 30px;
     transition       : all 0.3s ease; // Adicione uma transição suave para a troca de cor
-    box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
 
     &:hover:not(:disabled)
     {
@@ -346,9 +345,8 @@ h3
     // NOVA CLASSE: Quando a escala já existe
     &.btn-regerar
     {
-      background-color : rgb(248, 201, 58); // Um Laranja vibrante (pode usar $warning se preferir)
+      background-color : $primary;
       border           : none;
-      box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
 
       &:hover:not(:disabled)
       {
@@ -363,7 +361,6 @@ h3
     color            : $danger-dark;
     border           : 1px solid rgba($danger-dark, 0.1);
     border-radius    : 30px;
-    box-shadow       : 5px 5px 10px rgba(21, 21, 21, 0.2);
 
     &:hover:not(:disabled)
     {
@@ -391,7 +388,7 @@ h3
     justify-content : space-between;
     align-items     : center;
     color           : $primary;
-    font-weight     : 800;
+    font-weight     : 900;
     border-bottom   : 1px dashed #EDF2F7;
     padding-bottom  : 12px;
 
@@ -498,15 +495,15 @@ h3
     {
       font-weight : 800;
       color       : $primary;
-      font-size   : 0.9rem;
+      font-size   : 0.88rem;
       min-width   : 1.5rem;
     }
 
     .paciente-nome
     {
       color       : $text-body;
-      font-weight : 400;
-      font-size   : 0.95rem;
+      font-weight : 500;
+      font-size   : 0.88rem;
     }
   }
 
@@ -565,8 +562,8 @@ h3
 {
   background-color : #ffffff;
   padding          : 2.5rem; /* Espaçamento interno generoso */
-  border-radius    : 15px; /* Bordas arredondadas */
-  width            : 90%;
+  border-radius    : 14px; /* Bordas arredondadas */
+  width            : 75%;
   max-width        : 450px; /* Largura máxima confortável */
   box-shadow       : 0 10px 30px rgba(0, 0, 0, 0.25); /* Sombra para dar profundidade */
   animation        : modalEntrada 0.3s ease-out; /* Animação suave de entrada */
@@ -577,7 +574,7 @@ h3
   margin-top     : 0;
   margin-bottom  : 1.5rem;
   color          : #333;
-  font-size      : 1.5rem;
+  font-size      : 1.2rem;
   border-bottom  : 2px solid #eee;
   padding-bottom : 0.5rem;
 }
@@ -597,7 +594,7 @@ h3
 
 .modal-content .field
 {
-  margin-bottom : 1.2rem;
+  margin-bottom : 1.5rem;
 }
 
 .modal-content label
@@ -605,13 +602,13 @@ h3
   display       : block;
   margin-bottom : 0.5rem;
   font-weight   : bold;
-  color         : #555;
+  color         : #787878;
 }
 
 .modal-content input,
 .modal-content select
 {
-  width         : 100%;
+  width         : 92%;
   padding       : 10px 12px;
   border        : 1px solid #ddd;
   border-radius : 8px;

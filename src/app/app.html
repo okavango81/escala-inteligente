@@ -56,7 +56,7 @@
   </section>
 
   <section class="lista-pacientes">
-    <h3>3. Lista de Espera</h3>
+    <h3>3. Lista de Pacientes</h3>
     @for (p of pacientes(); track p.quarto; let i = $index) {
       <div class="paciente-card" [attr.data-crit]="p.criticidade">
         <div class="paciente-conteudo-flex">
@@ -87,7 +87,7 @@
       (click)="gerarEscala()"
       [disabled]="pacientes().length === 0">
 
-      {{ escalaGerada().length > 0 ? 'REGERAR ESCALA' : 'Gerar Escala' }}
+      {{ escalaGerada().length > 0 ? 'atualizar' : 'Gerar Escala' }}
 
     </button>
     <button class="btn-limpar" (click)="limparEscala()" [disabled]="escalaGerada().length === 0">
@@ -97,6 +97,7 @@
 
   <section class="resultado" cdkDropListGroup>
     @if (escalaGerada().length > 0) {
+      <h3>4. Sugestão de Escala</h3>
       @for (t of escalaGerada(); track t.nome) {
         <div class="tecnico-col">
           <h4>
